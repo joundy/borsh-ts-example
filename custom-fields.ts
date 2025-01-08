@@ -70,7 +70,10 @@ export function varuintField(properties: { type: UintTypes }) {
         }
       }
 
-      return decodeVaruint(buffer.subarray(0, reader._offset - start));
+      const value = decodeVaruint(buffer.subarray(0, reader._offset - start));
+      validateValueUintTypes(value, properties.type);
+
+      return value;
     },
   });
 }
