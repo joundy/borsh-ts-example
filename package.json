@@ -1,0 +1,14 @@
+{
+  "name": "borsh-ts-test",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@dao-xyz/borsh": "^5.2.3"
+  }
+}
