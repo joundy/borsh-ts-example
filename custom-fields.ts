@@ -8,7 +8,7 @@ import {
   U8_MAX_NUMBER,
   type UintTypes,
 } from "./types";
-import { decodeVaruint, encodeVaruint } from "./varuint";
+import { Varuint } from "./varuint";
 
 export function validateValueUintTypes(value: bigint, type: UintTypes) {
   if (value < 0) {
@@ -47,8 +47,8 @@ export function varuintField(properties: { type: UintTypes }) {
   return field({
     serialize: (value: bigint, writer) => {
       validateValueUintTypes(value, properties.type);
-      const varuint = encodeVaruint(value);
-      const bytes = new Uint8Array(varuint);
+      const varuint = Varuint.fromNumber(value);
+      const bytes = new Uint8Array(varuint.buffer);
       writer.set(bytes);
     },
     deserialize: (reader): bigint => {
@@ -70,10 +70,10 @@ export function varuintField(properties: { type: UintTypes }) {
         }
       }
 
-      const value = decodeVaruint(buffer.subarray(0, reader._offset - start));
-      validateValueUintTypes(value, properties.type);
+      const number = new Varuint(buffer.subarray(0, reader._offset - start)).toNumber();
+      validateValueUintTypes(number, properties.type);
 
-      return value;
+      return number;
     },
   });
 }

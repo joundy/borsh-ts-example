@@ -1,6 +1,7 @@
 import { deserialize, serialize, field } from "@dao-xyz/borsh";
 import { varuintField } from "./custom-fields";
 import { U128_MAX_NUMBER, U64_MAX_NUMBER } from "./types";
+// import { AZBase26 } from "./az-base26";
 
 class SomeClass {
   @field({ type: "string" })
@@ -34,6 +35,11 @@ async function main() {
   // Deserialize
   const deserialized = deserialize(serialized, SomeClass);
   console.log({ deserialized });
+
+  // const ticker = AZBase26.fromString("POHON.PISANG.ENAK.SEKALI.MANTAP");
+  // console.log({ ticker });
+  // const result = ticker.toString();
+  // console.log({ result });
 }
 
 main();
