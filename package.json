@@ -1,5 +1,5 @@
 {
-  "name": "borsh-ts-test",
+  "name": "borsh-ts-example",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
