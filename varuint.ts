@@ -1,4 +1,45 @@
+import { field } from "@dao-xyz/borsh";
 import { BUFFER_MAX_VARUINT_LENGTH, U128_MAX_NUMBER } from "./types";
+
+export class VaruintField {
+  @field({
+    serialize: (value: bigint, writer) => {
+      const varuint = Varuint.fromNumber(value);
+      const bytes = new Uint8Array(varuint.buffer);
+      writer.set(bytes);
+    },
+    deserialize: (reader): bigint => {
+      const start = reader._offset;
+      const buffer = Buffer.alloc(BUFFER_MAX_VARUINT_LENGTH);
+
+      while (true) {
+        if (reader._offset >= reader._buf.length) {
+          throw new Error("Unexpected end of buffer");
+        }
+
+        const byte = reader._buf[reader._offset];
+        buffer[reader._offset - start] = byte;
+
+        reader._offset++;
+
+        if ((byte & 128) === 0) {
+          break;
+        }
+      }
+
+      const number = new Varuint(
+        buffer.subarray(0, reader._offset - start),
+      ).toNumber();
+
+      return number;
+    },
+  })
+  value: bigint;
+
+  constructor(value: bigint) {
+    this.value = value;
+  }
+}
 
 export class Varuint {
   buffer: Buffer;

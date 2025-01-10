@@ -1,10 +1,34 @@
+import { field, option } from "@dao-xyz/borsh";
 import { U128_MAX_NUMBER } from "./types";
+import { VaruintField } from "./varuint";
+
+export class AZBase26Field {
+  @field({ type: VaruintField })
+  number: VaruintField;
+
+  @field({ type: option(VaruintField) })
+  spacers?: VaruintField;
+
+  constructor(str: string) {
+    const az = AZBase26.fromString(str);
+    this.number = new VaruintField(az.number);
+
+    if (az.spacers) {
+      this.spacers = new VaruintField(az.spacers);
+    }
+  }
+
+  toString() {
+    return new AZBase26(this.number.value, this.spacers?.value).toString();
+  }
+}
 
 export class AZBase26 {
   number: bigint;
-  spacers: bigint | null;
 
-  constructor(number: bigint, spacers: bigint | null) {
+  spacers?: bigint;
+
+  constructor(number: bigint, spacers: bigint | undefined) {
     this.number = number;
     this.spacers = spacers;
   }
@@ -19,10 +43,8 @@ export class AZBase26 {
     let spacersValue = 0n;
 
     let charIndex = 0;
-    console.log({ str });
     for (let i = 0; i < str.length; i += 1) {
       const c = str.charAt(i);
-      console.log(c);
       if (c >= "A" && c <= "Z") {
         if (charIndex > 0) {
           number += 1n;
@@ -46,7 +68,7 @@ export class AZBase26 {
       }
     }
 
-    return new AZBase26(number, spacersValue > 0n ? spacersValue : null);
+    return new AZBase26(number, spacersValue > 0n ? spacersValue : undefined);
   }
 
   toString(): string {

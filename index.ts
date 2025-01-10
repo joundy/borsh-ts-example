@@ -1,20 +1,18 @@
-import { deserialize, serialize, field } from "@dao-xyz/borsh";
-import { varuintField } from "./custom-fields";
-import { U128_MAX_NUMBER, U64_MAX_NUMBER } from "./types";
-// import { AZBase26 } from "./az-base26";
+import { serialize, field, option, deserialize } from "@dao-xyz/borsh";
+import { VaruintField } from "./varuint";
+import { AZBase26Field } from "./az-base26";
+import { brotli } from "./brotli";
 
 class SomeClass {
-  @field({ type: "string" })
-  a: string;
+  // example with optional value
+  @field({ type: option(AZBase26Field) })
+  ticker?: AZBase26Field;
 
-  @varuintField({ type: "u64" })
-  x: bigint;
+  @field({ type: VaruintField })
+  supply: VaruintField;
 
-  @field({ type: "u128" })
-  y: bigint;
-
-  @varuintField({ type: "u128" })
-  z: bigint;
+  @field({ type: VaruintField })
+  amount: VaruintField;
 
   constructor(data: SomeClass) {
     Object.assign(this, data);
@@ -22,24 +20,28 @@ class SomeClass {
 }
 async function main() {
   const value = new SomeClass({
-    a: "TEST",
-    x: U64_MAX_NUMBER,
-    y: 1n,
-    z: U128_MAX_NUMBER,
+    ticker: new AZBase26Field("POHON.PISANG.ENAK.SEKALI"),
+    supply: new VaruintField(100_000_000n),
+    amount: new VaruintField(1n),
   });
 
   // Serialize
   const serialized = serialize(value);
-  console.log({ serialized });
+  const size = serialized.length;
+  console.log({ serialized, totalBytes: `${size} bytes` });
+
+  const buffer = Buffer.from(serialized);
+  console.log(buffer.length);
+
+  // const compressed = await brotli.compress(buffer);
+  // console.log({ compressed });
+  // const decompressed = await brotli.decompress(compressed);
+  // console.log({ decompressed });
 
   // Deserialize
-  const deserialized = deserialize(serialized, SomeClass);
-  console.log({ deserialized });
-
-  // const ticker = AZBase26.fromString("POHON.PISANG.ENAK.SEKALI.MANTAP");
-  // console.log({ ticker });
-  // const result = ticker.toString();
-  // console.log({ result });
+  // const deserialized = deserialize(serialized, SomeClass);
+  // const ticker = deserialized.ticker?.toString();
+  // console.log({ deserialized, ticker });
 }
 
 main();
